@@ -43,8 +43,5 @@ I missed a Clark deadline because I could not find it on the website.
 45 minutes searching. Answer buried 6 clicks deep in a PDF.
 I built CampusPulse so no Clark student ever does that again.
 
-Built by Bhavethra Baabu — Clark University, Worcester MA
-''')
-content.close()
-print('Done!')
-"
+
+
