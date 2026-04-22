@@ -1,6 +1,4 @@
-python3 -c "
-content = open('README.md', 'w')
-content.write('''# CampusPulse Clark
+# CampusPulse Clark
 
 > Your 3am study buddy. Clark University AI assistant that never sleeps, never judges, and always knows the answer.
 
