@@ -631,8 +631,8 @@ function AskChat() {
             </button>
           </div>
           <p className="text-center text-xs mt-2" style={{ color: "rgba(255,255,255,0.2)" }}>
-            Enter to ask · Shift+Enter for new line · 🎤 Voice input supported
-          </p>
+  Enter to ask · Shift+Enter for new line · 🎤 Voice input supported · Knowledge base updated April 2026
+</p>
         </div>
       </div>
     </div>
