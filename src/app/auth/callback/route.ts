@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         full_name: data.user.user_metadata?.full_name || "",
         last_seen: new Date().toISOString(),
       }, { onConflict: "id" });
-      return NextResponse.redirect(`${origin}/ask`);
+      return NextResponse.redirect(`${origin}/home`);
     }
   }
   return NextResponse.redirect(`${origin}/auth?error=oauth_failed`);
