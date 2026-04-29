@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { NeonButton } from "@/components/ui/neon-button";
 
 const TEMPLATES = [
   {
@@ -134,11 +136,18 @@ const FIELD_LABELS: Record<string, string> = {
   semester: "Semester (e.g. Spring 2026)",
   currentOPTEnd: "Current OPT End Date",
   question: "Your Question / Concern",
-  professorName: "Professor's Last Name",
+  professorName: "Professor Last Name",
   currentGrade: "Current Grade",
   academicYear: "Academic Year (e.g. 2025-2026)",
-  purpose: "What you're applying for",
+  purpose: "What you are applying for",
   deadline: "Submission Deadline",
+};
+
+const CATEGORY_COLORS: Record<string, string> = {
+  "Registrar": "#4F46E5",
+  "ISSO Office": "#0891B2",
+  "Academic": "#7C3AED",
+  "Financial Aid": "#059669",
 };
 
 export default function EmailPage() {
@@ -149,8 +158,7 @@ export default function EmailPage() {
 
   const handleGenerate = () => {
     if (!selected) return;
-    const email = selected.generate(fields);
-    setGenerated(email);
+    setGenerated(selected.generate(fields));
   };
 
   const handleCopy = () => {
@@ -161,123 +169,220 @@ export default function EmailPage() {
 
   return (
     <main className="min-h-screen" style={{ background: "#0d0d0d" }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 md:px-12 py-4"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(13,13,13,0.95)" }}>
+
+      {/* ── NAV ── */}
+      <div className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 backdrop-blur-xl"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", background: "rgba(13,13,13,0.97)" }}>
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-white text-xs"
-              style={{ background: "#C00000" }}>CP</div>
-            <span className="font-black text-white">CampusPulse</span>
+          <Link href="/" className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="font-black text-white text-sm">CampusPulse</span>
+            <span className="text-xs px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(192,0,0,0.25)", color: "#ff8080" }}>Clark</span>
           </Link>
-          <span className="text-white/30">/</span>
-          <span className="text-sm font-semibold text-white/70">Email Templates</span>
+          <span style={{ color: "rgba(255,255,255,0.2)" }}>/</span>
+          <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.5)" }}>Email Templates</span>
         </div>
-        <Link href="/ask" className="text-xs px-4 py-2 rounded-lg font-bold text-white"
-          style={{ background: "#C00000" }}>Ask a question</Link>
+        <Link href="/ask">
+          <NeonButton variant="solid" size="sm"
+            className="font-bold text-white rounded-lg"
+            style={{ background: "#C00000" }}>
+            Ask a question
+          </NeonButton>
+        </Link>
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="mb-8">
+
+        {/* ── HEADER ── */}
+        <motion.div className="mb-8"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-4xl font-black text-white mb-2">Clark Email Templates</h1>
-          <p className="text-white/40">Professional emails for every Clark University situation</p>
-        </div>
+          <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
+            Professional emails for every Clark University situation
+          </p>
+        </motion.div>
 
-        {!selected ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {TEMPLATES.map(t => (
-              <button key={t.id} onClick={() => { setSelected(t); setFields({}); setGenerated(""); }}
-                className="text-left p-5 rounded-2xl transition-all duration-300 hover:-translate-y-1"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(192,0,0,0.4)"; (e.currentTarget as HTMLElement).style.background = "rgba(192,0,0,0.06)"; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)"; (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)"; }}>
-                <div className="text-2xl mb-3">{t.icon}</div>
-                <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "#C00000" }}>{t.category}</div>
-                <h3 className="font-black text-white text-sm">{t.title}</h3>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Form */}
-            <div>
-              <button onClick={() => { setSelected(null); setGenerated(""); }}
-                className="text-sm mb-6 flex items-center gap-1 transition-colors"
-                style={{ color: "rgba(255,255,255,0.4)" }}
-                onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "white"}
-                onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)"}>
-                ← Back to templates
-              </button>
+        <AnimatePresence mode="wait">
 
-              <h2 className="text-xl font-black text-white mb-1">{selected.icon} {selected.title}</h2>
-              <p className="text-xs mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>Fill in the fields below to generate your email</p>
-
-              <div className="space-y-4">
-                {selected.fields.map(field => (
-                  <div key={field}>
-                    <label className="text-xs font-medium block mb-1.5" style={{ color: "rgba(255,255,255,0.5)" }}>
-                      {FIELD_LABELS[field] || field}
-                    </label>
-                    {field === "reason" || field === "question" ? (
-                      <textarea
-                        value={fields[field] || ""}
-                        onChange={e => setFields(f => ({ ...f, [field]: e.target.value }))}
-                        rows={3}
-                        className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none resize-none"
-                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
-                        placeholder={`Enter ${FIELD_LABELS[field]?.toLowerCase() || field}...`}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        value={fields[field] || ""}
-                        onChange={e => setFields(f => ({ ...f, [field]: e.target.value }))}
-                        className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none"
-                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
-                        placeholder={`Enter ${FIELD_LABELS[field]?.toLowerCase() || field}...`}
-                      />
-                    )}
-                  </div>
-                ))}
-
-                <button onClick={handleGenerate}
-                  className="w-full py-3 rounded-xl font-black text-white text-sm transition-all hover:opacity-90"
-                  style={{ background: "linear-gradient(135deg,#C00000,#8B0000)" }}>
-                  Generate Email →
-                </button>
-              </div>
-            </div>
-
-            {/* Preview */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-white text-sm">Email Preview</h3>
-                {generated && (
-                  <button onClick={handleCopy}
-                    className="text-xs px-3 py-1.5 rounded-lg font-bold transition-all"
-                    style={{ background: copied ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)", color: copied ? "#4ade80" : "rgba(255,255,255,0.6)", border: `1px solid ${copied ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.1)"}` }}>
-                    {copied ? "✓ Copied!" : "Copy email"}
+          {/* ── TEMPLATE GRID ── */}
+          {!selected && (
+            <motion.div key="grid"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}>
+              {TEMPLATES.map((t, i) => (
+                <motion.div key={t.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.07 }}
+                  whileHover={{ y: -4 }}>
+                  <button
+                    onClick={() => { setSelected(t); setFields({}); setGenerated(""); }}
+                    className="w-full text-left p-5 rounded-2xl transition-all duration-200 group"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLElement).style.borderColor = `${CATEGORY_COLORS[t.category] || "#C00000"}60`;
+                      (e.currentTarget as HTMLElement).style.background = `${CATEGORY_COLORS[t.category] || "#C00000"}10`;
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.08)";
+                      (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
+                    }}>
+                    <motion.div
+                      style={{ fontSize: "28px", marginBottom: "12px" }}
+                      whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
+                      transition={{ duration: 0.3 }}>
+                      {t.icon}
+                    </motion.div>
+                    <div className="text-xs font-bold uppercase tracking-widest mb-1.5"
+                      style={{ color: CATEGORY_COLORS[t.category] || "#C00000" }}>
+                      {t.category}
+                    </div>
+                    <h3 className="font-black text-white text-sm mb-2">{t.title}</h3>
+                    <div className="text-xs font-medium transition-colors"
+                      style={{ color: "rgba(255,255,255,0.3)" }}>
+                      {t.fields.length} fields required →
+                    </div>
                   </button>
-                )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* ── FORM + PREVIEW ── */}
+          {selected && (
+            <motion.div key="form"
+              className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}>
+
+              {/* Form */}
+              <div>
+                <button onClick={() => { setSelected(null); setGenerated(""); }}
+                  className="text-sm mb-6 flex items-center gap-1.5 transition-colors"
+                  style={{ color: "rgba(255,255,255,0.4)" }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = "white"}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.4)"}>
+                  ← Back to templates
+                </button>
+
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl"
+                    style={{ background: `${CATEGORY_COLORS[selected.category] || "#C00000"}15`, border: `1px solid ${CATEGORY_COLORS[selected.category] || "#C00000"}30` }}>
+                    {selected.icon}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-white">{selected.title}</h2>
+                    <p className="text-xs" style={{ color: CATEGORY_COLORS[selected.category] || "#C00000" }}>
+                      {selected.category}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  {selected.fields.map((field, i) => (
+                    <motion.div key={field}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}>
+                      <label className="text-xs font-medium block mb-1.5"
+                        style={{ color: "rgba(255,255,255,0.5)" }}>
+                        {FIELD_LABELS[field] || field}
+                      </label>
+                      {field === "reason" || field === "question" ? (
+                        <textarea
+                          value={fields[field] || ""}
+                          onChange={e => setFields(f => ({ ...f, [field]: e.target.value }))}
+                          rows={3}
+                          className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none resize-none transition-colors"
+                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                          placeholder={`Enter ${FIELD_LABELS[field]?.toLowerCase() || field}...`}
+                          onFocus={e => (e.currentTarget.style.borderColor = "rgba(192,0,0,0.5)")}
+                          onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={fields[field] || ""}
+                          onChange={e => setFields(f => ({ ...f, [field]: e.target.value }))}
+                          className="w-full px-4 py-3 rounded-xl text-sm text-white outline-none transition-colors"
+                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+                          placeholder={`Enter ${FIELD_LABELS[field]?.toLowerCase() || field}...`}
+                          onFocus={e => (e.currentTarget.style.borderColor = "rgba(192,0,0,0.5)")}
+                          onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)")}
+                        />
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                <NeonButton
+                  onClick={handleGenerate}
+                  variant="solid"
+                  size="lg"
+                  className="w-full font-black text-white rounded-xl py-3"
+                  style={{ background: "linear-gradient(135deg,#C00000,#8B0000)", boxShadow: "0 4px 20px rgba(192,0,0,0.3)" }}>
+                  Generate Email →
+                </NeonButton>
               </div>
 
-              {generated ? (
-                <div className="rounded-2xl p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap overflow-auto"
-                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.75)", maxHeight: "500px" }}>
-                  {generated}
+              {/* Preview */}
+              <div>
+                <div className="flex items-center justify-between mb-3 sticky top-20">
+                  <h3 className="font-bold text-white text-sm">Email Preview</h3>
+                  {generated && (
+                    <NeonButton
+                      onClick={handleCopy}
+                      variant={copied ? "ghost" : "default"}
+                      size="sm"
+                      className="text-xs rounded-lg font-bold transition-all"
+                      style={copied
+                        ? { background: "rgba(74,222,128,0.12)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.3)" }
+                        : { color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)" }}>
+                      {copied ? "✓ Copied!" : "Copy email"}
+                    </NeonButton>
+                  )}
                 </div>
-              ) : (
-                <div className="rounded-2xl p-8 flex flex-col items-center justify-center text-center"
-                  style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", minHeight: "300px" }}>
-                  <span className="text-4xl mb-3">✉️</span>
-                  <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
-                    Fill in the form and click<br />"Generate Email" to see your email
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+
+                <AnimatePresence mode="wait">
+                  {generated ? (
+                    <motion.div
+                      key="preview"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="rounded-2xl p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap overflow-auto"
+                      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.75)", maxHeight: "520px" }}>
+                      {generated}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="rounded-2xl p-8 flex flex-col items-center justify-center text-center"
+                      style={{ background: "rgba(255,255,255,0.02)", border: "1px dashed rgba(255,255,255,0.1)", minHeight: "300px" }}>
+                      <motion.span
+                        className="text-5xl mb-4 block"
+                        animate={{ y: [0, -8, 0] }}
+                        transition={{ repeat: Infinity, duration: 2 }}>
+                        ✉️
+                      </motion.span>
+                      <p className="text-sm" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        Fill in the form and click<br />
+                        <span style={{ color: "#C00000" }}>Generate Email</span> to preview
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { NeonButton } from "@/components/ui/neon-button";
 
 type Task = {
   id: string;
@@ -90,24 +91,24 @@ const SCENARIOS: Scenario[] = [
   },
 ];
 
-const CATEGORY_COLORS: Record<string, { bg: string; text: string; line: string }> = {
-  "Admin":      { bg: "#fff1f1", text: "#991b1b", line: "#C00000" },
-  "Academic":   { bg: "#eff6ff", text: "#1e40af", line: "#3b82f6" },
-  "Resources":  { bg: "#f0fdf4", text: "#166534", line: "#22c55e" },
-  "Planning":   { bg: "#faf5ff", text: "#6b21a8", line: "#a855f7" },
-  "Graduation": { bg: "#fffbeb", text: "#92400e", line: "#f59e0b" },
-  "Career":     { bg: "#ecfdf5", text: "#065f46", line: "#10b981" },
-  "ISSS":       { bg: "#fff7ed", text: "#9a3412", line: "#f97316" },
-  "Documents":  { bg: "#f0f9ff", text: "#0c4a6e", line: "#0ea5e9" },
-  "USCIS":      { bg: "#fdf4ff", text: "#701a75", line: "#d946ef" },
-};
-
-const PRIORITY_LABEL: Record<string, string> = {
-  high: "High", medium: "Medium", low: "Low"
+const CATEGORY_COLORS: Record<string, { border: string; text: string; dot: string }> = {
+  "Admin":      { border: "rgba(192,0,0,0.3)",   text: "#ff8080", dot: "#C00000" },
+  "Academic":   { border: "rgba(59,130,246,0.3)", text: "#93c5fd", dot: "#3b82f6" },
+  "Resources":  { border: "rgba(34,197,94,0.3)",  text: "#86efac", dot: "#22c55e" },
+  "Planning":   { border: "rgba(168,85,247,0.3)", text: "#d8b4fe", dot: "#a855f7" },
+  "Graduation": { border: "rgba(245,158,11,0.3)", text: "#fcd34d", dot: "#f59e0b" },
+  "Career":     { border: "rgba(16,185,129,0.3)", text: "#6ee7b7", dot: "#10b981" },
+  "ISSS":       { border: "rgba(249,115,22,0.3)", text: "#fdba74", dot: "#f97316" },
+  "Documents":  { border: "rgba(14,165,233,0.3)", text: "#7dd3fc", dot: "#0ea5e9" },
+  "USCIS":      { border: "rgba(217,70,239,0.3)", text: "#f0abfc", dot: "#d946ef" },
 };
 
 const PRIORITY_COLOR: Record<string, string> = {
   high: "#C00000", medium: "#d97706", low: "#6b7280"
+};
+
+const PRIORITY_LABEL: Record<string, string> = {
+  high: "High", medium: "Med", low: "Low"
 };
 
 function groupByCategory(tasks: Task[]) {
@@ -151,40 +152,40 @@ export default function PlannerPage() {
   const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
   const groups = groupByCategory(tasks);
   const categories = Object.keys(groups);
-
   const circumference = 2 * Math.PI * 22;
   const strokeDash = circumference - (progress / 100) * circumference;
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen" style={{ background: "#0d0d0d", color: "white" }}>
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <nav className="sticky top-0 z-50" style={{ background: "rgba(13,13,13,0.95)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div className="max-w-4xl mx-auto px-6 flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md flex items-center justify-center font-black text-white text-xs"
-                style={{ background: "#C00000" }}>CP</div>
-              <span className="font-black text-gray-900 text-sm">CampusPulse</span>
+            <Link href="/" className="flex items-center gap-2 px-3 py-1.5 rounded-full" style={{ background: "#111", border: "1px solid rgba(255,255,255,0.08)" }}>
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="font-black text-white text-sm">CampusPulse</span>
+              <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(192,0,0,0.2)", color: "#ff8080" }}>Clark</span>
             </Link>
             {selected && (
               <>
-                <span className="text-gray-300">/</span>
-                <span className="text-sm text-gray-500">{selected.label}</span>
+                <span style={{ color: "rgba(255,255,255,0.2)" }}>/</span>
+                <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>{selected.label}</span>
               </>
             )}
           </div>
           <div className="flex items-center gap-2">
             {selected && (
               <button onClick={() => { setSelected(null); setTasks([]); }}
-                className="text-xs px-3 py-1.5 rounded-md border border-gray-200 text-gray-500 hover:border-gray-400 transition-colors">
+                className="text-xs px-3 py-1.5 rounded-lg transition-colors"
+                style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)", background: "transparent" }}>
                 ← All plans
               </button>
             )}
-            <Link href="/ask"
-              className="text-xs px-4 py-1.5 rounded-md font-bold text-white hover:opacity-90 transition-opacity"
-              style={{ background: "#C00000" }}>
-              Ask AI
+            <Link href="/ask">
+              <NeonButton variant="solid" size="sm" className="font-bold text-xs">
+                Ask AI
+              </NeonButton>
             </Link>
           </div>
         </div>
@@ -192,15 +193,15 @@ export default function PlannerPage() {
 
       {/* ── SCENARIO SELECTOR ── */}
       {!selected && (
-        <div className="max-w-4xl mx-auto px-6 py-12">
-          <div className="mb-10">
-            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C00000" }}>
+        <div className="max-w-4xl mx-auto px-6 py-16">
+          <div className="mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs mb-4"
+              style={{ background: "rgba(192,0,0,0.1)", border: "1px solid rgba(192,0,0,0.25)", color: "#ff8080" }}>
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
               Study Planner
-            </p>
-            <h1 className="text-4xl font-black text-gray-900 mb-3">
-              Your academic checklist
-            </h1>
-            <p className="text-gray-500 text-lg">
+            </div>
+            <h1 className="text-4xl font-black text-white mb-3">Your academic checklist</h1>
+            <p className="text-lg" style={{ color: "rgba(255,255,255,0.4)" }}>
               Clark-specific step-by-step plans for every academic milestone.
             </p>
           </div>
@@ -208,16 +209,16 @@ export default function PlannerPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {SCENARIOS.map(s => (
               <button key={s.key} onClick={() => loadScenario(s)}
-                className="group text-left p-6 rounded-2xl border border-gray-100 hover:border-red-200 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm bg-white">
+                className="group text-left p-6 rounded-2xl transition-all duration-200 hover:-translate-y-0.5"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(192,0,0,0.4)")}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.07)")}>
                 <div className="text-3xl mb-4">{s.icon}</div>
-                <h3 className="font-black text-gray-900 text-lg mb-1">{s.label}</h3>
-                <p className="text-sm text-gray-500 mb-4">{s.desc}</p>
+                <h3 className="font-black text-white text-lg mb-1">{s.label}</h3>
+                <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>{s.desc}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-400">{s.tasks.length} tasks</span>
-                  <span className="text-xs font-bold transition-colors group-hover:text-red-600"
-                    style={{ color: "#C00000" }}>
-                    Start checklist →
-                  </span>
+                  <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>{s.tasks.length} tasks</span>
+                  <span className="text-xs font-bold" style={{ color: "#ff8080" }}>Start checklist →</span>
                 </div>
               </button>
             ))}
@@ -229,30 +230,29 @@ export default function PlannerPage() {
       {selected && (
         <div className="max-w-4xl mx-auto px-6 py-10">
 
-          {/* Header with progress ring */}
-          <div className="flex items-start justify-between mb-10 pb-8 border-b border-gray-100">
+          {/* Header */}
+          <div className="flex items-start justify-between mb-10 pb-8" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C00000" }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs mb-3"
+                style={{ background: "rgba(192,0,0,0.1)", border: "1px solid rgba(192,0,0,0.25)", color: "#ff8080" }}>
                 {selected.icon} {selected.label}
-              </p>
-              <h1 className="text-3xl font-black text-gray-900 mb-2">Your checklist</h1>
-              <p className="text-gray-500">{selected.desc}</p>
-
-              {/* Stats row */}
+              </div>
+              <h1 className="text-3xl font-black text-white mb-2">Your checklist</h1>
+              <p style={{ color: "rgba(255,255,255,0.4)" }}>{selected.desc}</p>
               <div className="flex items-center gap-6 mt-4">
                 <div>
-                  <div className="text-2xl font-black text-gray-900">{completed}</div>
-                  <div className="text-xs text-gray-400">completed</div>
+                  <div className="text-2xl font-black text-white">{completed}</div>
+                  <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>completed</div>
                 </div>
-                <div className="w-px h-8 bg-gray-100" />
+                <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.08)" }} />
                 <div>
-                  <div className="text-2xl font-black text-gray-900">{total - completed}</div>
-                  <div className="text-xs text-gray-400">remaining</div>
+                  <div className="text-2xl font-black text-white">{total - completed}</div>
+                  <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>remaining</div>
                 </div>
-                <div className="w-px h-8 bg-gray-100" />
+                <div className="w-px h-8" style={{ background: "rgba(255,255,255,0.08)" }} />
                 <div>
-                  <div className="text-2xl font-black text-gray-900">{categories.length}</div>
-                  <div className="text-xs text-gray-400">sections</div>
+                  <div className="text-2xl font-black text-white">{categories.length}</div>
+                  <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>sections</div>
                 </div>
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function PlannerPage() {
             {/* Progress ring */}
             <div className="flex-shrink-0 relative w-20 h-20">
               <svg width="80" height="80" viewBox="0 0 56 56">
-                <circle cx="28" cy="28" r="22" fill="none" stroke="#f3f4f6" strokeWidth="4" />
+                <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
                 <circle cx="28" cy="28" r="22" fill="none" stroke="#C00000" strokeWidth="4"
                   strokeDasharray={circumference}
                   strokeDashoffset={strokeDash}
@@ -269,10 +269,9 @@ export default function PlannerPage() {
                   style={{ transition: "stroke-dashoffset 0.6s ease" }}
                 />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-sm font-black text-gray-900">{progress}%</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-sm font-black text-white">{progress}%</span>
               </div>
-
               {progress === 100 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -283,62 +282,58 @@ export default function PlannerPage() {
             </div>
           </div>
 
+          {/* All done banner */}
           {progress === 100 && (
-            <div className="rounded-2xl p-5 mb-8 flex items-center gap-4 border border-green-200 bg-green-50">
+            <div className="rounded-2xl p-5 mb-8 flex items-center gap-4"
+              style={{ background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.25)" }}>
               <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                   <path d="M4 9l3 3 7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
               <div>
-                <p className="font-black text-green-900 text-sm">All done! 🎉</p>
-                <p className="text-green-700 text-xs">You've completed every task. You're ready!</p>
+                <p className="font-black text-green-400 text-sm">All done! 🎉</p>
+                <p className="text-xs" style={{ color: "rgba(134,239,172,0.7)" }}>You've completed every task. You're ready!</p>
               </div>
             </div>
           )}
 
           {/* Timeline */}
           <div className="space-y-10">
-            {categories.map((category, catIdx) => {
+            {categories.map((category) => {
               const catTasks = groups[category];
-              const colors = CATEGORY_COLORS[category] || { bg: "#f9fafb", text: "#374151", line: "#9ca3af" };
+              const colors = CATEGORY_COLORS[category] || { border: "rgba(255,255,255,0.1)", text: "rgba(255,255,255,0.5)", dot: "#fff" };
               const catDone = catTasks.filter(t => t.done).length;
 
               return (
-                <div key={category} className="relative">
+                <div key={category}>
                   {/* Category header */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ background: colors.line }} />
-                    <h2 className="text-xs font-black uppercase tracking-widest"
-                      style={{ color: colors.text }}>
+                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: colors.dot }} />
+                    <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: colors.text }}>
                       {category}
                     </h2>
-                    <div className="flex-1 h-px" style={{ background: `${colors.line}30` }} />
+                    <div className="flex-1 h-px" style={{ background: colors.border }} />
                     <span className="text-xs font-medium" style={{ color: colors.text }}>
                       {catDone}/{catTasks.length}
                     </span>
                   </div>
 
-                  {/* Tasks with timeline line */}
+                  {/* Tasks */}
                   <div className="ml-4 relative">
-                    {/* Vertical line */}
-                    <div className="absolute left-2.5 top-0 bottom-0 w-px"
-                      style={{ background: `${colors.line}25` }} />
-
+                    <div className="absolute left-2.5 top-0 bottom-0 w-px" style={{ background: colors.border }} />
                     <div className="space-y-2">
-                      {catTasks.map((task, taskIdx) => (
+                      {catTasks.map((task) => (
                         <div key={task.id}
-                          className="relative flex items-start gap-4 pl-8 group cursor-pointer"
+                          className="relative flex items-start gap-4 pl-8 cursor-pointer"
                           onClick={() => toggleTask(task.id)}>
 
                           {/* Timeline dot */}
-                          <div className="absolute left-0 top-3 flex-shrink-0 transition-all duration-200"
-                            style={{ zIndex: 1 }}>
-                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200`}
+                          <div className="absolute left-0 top-3" style={{ zIndex: 1 }}>
+                            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200"
                               style={{
-                                background: task.done ? colors.line : "white",
-                                borderColor: task.done ? colors.line : "#e5e7eb",
+                                background: task.done ? colors.dot : "transparent",
+                                borderColor: task.done ? colors.dot : "rgba(255,255,255,0.15)",
                               }}>
                               {task.done && (
                                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
@@ -349,27 +344,24 @@ export default function PlannerPage() {
                           </div>
 
                           {/* Task card */}
-                          <div className={`flex-1 flex items-center justify-between py-3 px-4 rounded-xl border transition-all duration-200 ${task.done ? "opacity-50" : "hover:border-gray-200 hover:shadow-sm"}`}
+                          <div className="flex-1 flex items-center justify-between py-3 px-4 rounded-xl transition-all duration-200"
                             style={{
-                              background: task.done ? "#fafafa" : "white",
-                              borderColor: task.done ? "transparent" : "#f3f4f6",
+                              background: task.done ? "rgba(255,255,255,0.02)" : "rgba(255,255,255,0.04)",
+                              border: `1px solid ${task.done ? "transparent" : "rgba(255,255,255,0.07)"}`,
+                              opacity: task.done ? 0.5 : 1,
                             }}>
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium transition-all ${task.done ? "line-through text-gray-400" : "text-gray-900"}`}>
-                                {task.text}
-                              </p>
-                            </div>
-
-                            <div className="flex items-center gap-2 ml-3 flex-shrink-0">
-                              {/* Priority dot */}
-                              <div className="flex items-center gap-1">
-                                <div className="w-1.5 h-1.5 rounded-full"
-                                  style={{ background: PRIORITY_COLOR[task.priority] }} />
-                                <span className="text-xs hidden sm:block"
-                                  style={{ color: PRIORITY_COLOR[task.priority] }}>
-                                  {PRIORITY_LABEL[task.priority]}
-                                </span>
-                              </div>
+                            <p className="text-sm font-medium transition-all"
+                              style={{
+                                color: task.done ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.85)",
+                                textDecoration: task.done ? "line-through" : "none",
+                              }}>
+                              {task.text}
+                            </p>
+                            <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
+                              <div className="w-1.5 h-1.5 rounded-full" style={{ background: PRIORITY_COLOR[task.priority] }} />
+                              <span className="text-xs hidden sm:block" style={{ color: PRIORITY_COLOR[task.priority] }}>
+                                {PRIORITY_LABEL[task.priority]}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -382,46 +374,49 @@ export default function PlannerPage() {
           </div>
 
           {/* Add custom task */}
-          <div className="mt-10 pt-8 border-t border-gray-100">
-            <h3 className="text-sm font-black text-gray-900 mb-3">Add a custom task</h3>
+          <div className="mt-10 pt-8" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+            <h3 className="text-sm font-black text-white mb-3">Add a custom task</h3>
             <div className="flex gap-2">
               <select value={customCategory} onChange={e => setCustomCategory(e.target.value)}
-                className="text-sm px-3 py-2.5 rounded-lg border border-gray-200 text-gray-700 outline-none focus:border-red-300 transition-colors bg-white">
+                className="text-sm px-3 py-2.5 rounded-lg outline-none transition-colors"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}>
                 {Object.keys(CATEGORY_COLORS).map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat} value={cat} style={{ background: "#1a1a1a" }}>{cat}</option>
                 ))}
               </select>
               <input type="text" value={customTask}
                 onChange={e => setCustomTask(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && addTask()}
                 placeholder="Add your own task..."
-                className="flex-1 text-sm px-4 py-2.5 rounded-lg border border-gray-200 text-gray-900 outline-none focus:border-red-300 transition-colors" />
-              <button onClick={addTask}
-                className="px-4 py-2.5 rounded-lg text-sm font-bold text-white hover:opacity-90 transition-opacity"
-                style={{ background: "#C00000" }}>
+                className="flex-1 text-sm px-4 py-2.5 rounded-lg outline-none transition-colors"
+                style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "white" }} />
+              <NeonButton variant="solid" size="default" onClick={addTask} className="font-bold text-sm">
                 Add
-              </button>
+              </NeonButton>
             </div>
           </div>
 
           {/* Bottom actions */}
           <div className="flex gap-3 mt-6">
-            <Link href="/ask"
-              className="flex-1 py-3 rounded-xl text-sm font-bold text-center border border-gray-200 text-gray-700 hover:border-gray-400 transition-colors">
-              Ask AI about this →
+            <Link href="/ask" className="flex-1">
+              <NeonButton variant="default" size="default" className="w-full font-bold text-sm">
+                Ask AI about this →
+              </NeonButton>
             </Link>
-            <Link href="/gpa"
-              className="flex-1 py-3 rounded-xl text-sm font-black text-white text-center hover:opacity-90 transition-opacity"
-              style={{ background: "#C00000" }}>
-              GPA Calculator →
+            <Link href="/gpa" className="flex-1">
+              <NeonButton variant="solid" size="default" className="w-full font-black text-sm">
+                GPA Calculator →
+              </NeonButton>
             </Link>
           </div>
         </div>
       )}
 
       {/* Footer */}
-      <div className="border-t border-gray-100 py-5 text-center mt-10">
-        <p className="text-xs text-gray-400">CampusPulse · Clark University · Tech Innovation Challenge 2026</p>
+      <div className="mt-10 py-5 text-center" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          CampusPulse · Clark University · Tech Innovation Challenge 2026
+        </p>
       </div>
     </main>
   );
