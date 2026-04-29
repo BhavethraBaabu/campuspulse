@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { NeonButton } from "@/components/ui/neon-button";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CLARK_COURSES = [
   { code: "PSYC 101", name: "Introduction to Psychology", dept: "Psychology", credits: 3, tags: ["psychology", "mind", "behavior", "people", "mental health", "social"] },
@@ -65,21 +67,23 @@ type Recommendation = {
 };
 
 const DEPT_COLORS: Record<string, string> = {
-  "Computer Science": "#1d4ed8",
-  "Mathematics": "#0369a1",
-  "Psychology": "#7c3aed",
+  "Computer Science": "#4F46E5",
+  "Mathematics": "#0891B2",
+  "Psychology": "#7C3AED",
   "Data Science": "#059669",
   "Biology": "#16a34a",
-  "Economics": "#b45309",
+  "Economics": "#D97706",
   "Management": "#C00000",
-  "Neuroscience": "#be185d",
-  "Philosophy": "#92400e",
-  "Sociology": "#0e7490",
+  "Neuroscience": "#DB2777",
+  "Philosophy": "#92400E",
+  "Sociology": "#0369a1",
   "Geography": "#065f46",
   "Environmental Science": "#166534",
-  "English": "#6d28d9",
-  "Communication": "#c2410c",
+  "English": "#6D28D9",
+  "Communication": "#C2410C",
 };
+
+const STEPS = ["interests", "goals", "results"];
 
 export default function CoursesPage() {
   const [step, setStep] = useState<"interests" | "goals" | "results">("interests");
@@ -89,6 +93,8 @@ export default function CoursesPage() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(false);
   const [aiReasoning, setAiReasoning] = useState("");
+
+  const stepIdx = STEPS.indexOf(step);
 
   const toggleInterest = (interest: string) => {
     setSelectedInterests(prev =>
@@ -133,282 +139,313 @@ export default function CoursesPage() {
     setStep("results");
   };
 
-  const STEPS = ["interests", "goals", "results"];
-  const stepIdx = STEPS.indexOf(step);
-
-  const matchColor = (m: number) => m >= 70 ? "#15803d" : m >= 40 ? "#b45309" : "#C00000";
+  const matchColor = (m: number) => m >= 70 ? "#4ade80" : m >= 40 ? "#fbbf24" : "#f87171";
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen" style={{ background: "#0d0d0d" }}>
 
       {/* ── NAV ── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center font-black text-white text-sm"
-              style={{ background: "#C00000" }}>CP</div>
-            <div>
-              <div className="font-black text-gray-900 text-sm leading-none">CampusPulse</div>
-              <div className="text-xs leading-none mt-0.5" style={{ color: "#C00000" }}>Clark University</div>
-            </div>
+      <nav className="sticky top-0 z-50 backdrop-blur-xl"
+        style={{ background: "rgba(13,13,13,0.95)", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between h-14">
+          <Link href="/" className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+            style={{ background: "#0d0d0d", border: "1px solid rgba(255,255,255,0.1)" }}>
+            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="font-black text-white text-sm">CampusPulse</span>
+            <span className="text-xs px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(192,0,0,0.25)", color: "#ff8080" }}>Clark</span>
           </Link>
 
-          {/* Step breadcrumb */}
-          <div className="hidden md:flex items-center gap-1 text-sm">
+          {/* Step progress */}
+          <div className="hidden md:flex items-center gap-2">
             {STEPS.map((s, i) => (
-              <div key={s} className="flex items-center gap-1">
-                <span className={`capitalize font-medium ${i === stepIdx ? "text-gray-900" : i < stepIdx ? "text-green-600" : "text-gray-400"}`}>
-                  {i < stepIdx ? "✓ " : ""}{s}
-                </span>
-                {i < 2 && <span className="text-gray-300 mx-1">→</span>}
+              <div key={s} className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold transition-all"
+                    style={{
+                      background: i < stepIdx ? "#4ade80" : i === stepIdx ? "#C00000" : "rgba(255,255,255,0.08)",
+                      color: i <= stepIdx ? "white" : "rgba(255,255,255,0.3)",
+                    }}>
+                    {i < stepIdx ? "✓" : i + 1}
+                  </div>
+                  <span className="text-xs capitalize"
+                    style={{ color: i === stepIdx ? "white" : "rgba(255,255,255,0.3)" }}>{s}</span>
+                </div>
+                {i < 2 && <span style={{ color: "rgba(255,255,255,0.2)" }}>→</span>}
               </div>
             ))}
           </div>
 
-          <Link href="/ask"
-            className="text-sm font-bold px-5 py-2 rounded text-white transition-all hover:opacity-90"
-            style={{ background: "#C00000" }}>
-            Ask AI
+          <Link href="/ask">
+            <NeonButton variant="solid" size="sm"
+              className="font-bold text-white rounded-lg px-4 py-2 text-xs"
+              style={{ background: "#C00000" }}>
+              Ask AI
+            </NeonButton>
           </Link>
         </div>
 
         {/* Progress bar */}
-        <div className="h-0.5 bg-gray-100">
+        <div className="h-px" style={{ background: "rgba(255,255,255,0.05)" }}>
           <div className="h-full transition-all duration-700"
             style={{ width: `${(stepIdx / 2) * 100}%`, background: "#C00000" }} />
         </div>
       </nav>
 
-      {/* ── HERO BAND ── */}
-      <div className="py-12 border-b border-gray-100" style={{ background: "#fafafa" }}>
-        <div className="max-w-2xl mx-auto px-6 text-center">
+      {/* ── HERO ── */}
+      <div className="py-14 text-center border-b" style={{ borderColor: "rgba(255,255,255,0.06)", background: "rgba(192,0,0,0.04)" }}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#C00000" }}>
             AI Course Recommender
           </p>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight mb-4">
+          <h1 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">
             Find your perfect Clark courses
           </h1>
-          <p className="text-lg text-gray-500 leading-relaxed">
-            Tell us what you love and where you want to go — we'll match you with Clark University courses that fit.
+          <p className="text-lg max-w-xl mx-auto leading-relaxed px-6"
+            style={{ color: "rgba(255,255,255,0.45)" }}>
+            Tell us what you love and where you want to go — we will match you with Clark courses that fit.
           </p>
-        </div>
+        </motion.div>
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-14">
 
         {/* ── STEP 1 — INTERESTS ── */}
-        {step === "interests" && (
-          <div>
-            <div className="mb-10">
-              <h2 className="text-2xl font-black text-gray-900 mb-2">What are you interested in?</h2>
-              <p className="text-gray-500">Select everything that appeals to you — the more you choose, the better your recommendations.</p>
-            </div>
-
-            {/* Interest pills */}
-            <div className="flex flex-wrap gap-2 mb-8">
-              {INTERESTS.map(({ label, emoji }) => (
-                <button key={label} onClick={() => toggleInterest(label)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 border"
-                  style={selectedInterests.includes(label)
-                    ? { background: "#C00000", color: "white", borderColor: "#C00000" }
-                    : { background: "white", color: "#374151", borderColor: "#d1d5db" }}>
-                  <span style={{ fontSize: "14px" }}>{emoji}</span>
-                  {label}
-                  {selectedInterests.includes(label) && (
-                    <span className="text-xs font-bold">✓</span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Custom interest */}
-            <div className="mb-8">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Anything else? Add your own
-              </label>
-              <input type="text" value={customInterest}
-                onChange={e => setCustomInterest(e.target.value)}
-                placeholder="e.g. Urban planning, Film studies, Public health..."
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm text-gray-900 outline-none focus:border-red-400 transition-colors"
-              />
-            </div>
-
-            {/* Count */}
-            {selectedInterests.length > 0 && (
-              <p className="text-sm text-gray-500 mb-6">
-                <span className="font-bold text-gray-900">{selectedInterests.length}</span> interest{selectedInterests.length !== 1 ? "s" : ""} selected
-              </p>
-            )}
-
-            <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-              <div />
-              <button
-                onClick={() => setStep("goals")}
-                disabled={selectedInterests.length === 0 && !customInterest}
-                className="flex items-center gap-2 px-8 py-3 rounded font-bold text-white text-sm transition-all disabled:opacity-40 hover:opacity-90"
-                style={{ background: "#C00000" }}>
-                Next: Your goal
-                <span>→</span>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── STEP 2 — GOALS ── */}
-        {step === "goals" && (
-          <div>
-            <div className="mb-10">
-              <h2 className="text-2xl font-black text-gray-900 mb-2">What's your career goal?</h2>
-              <p className="text-gray-500">This helps us prioritize courses most relevant to your future.</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
-              {GOALS.map(({ label, emoji }) => (
-                <button key={label} onClick={() => setSelectedGoal(label)}
-                  className="flex items-center gap-3 px-5 py-4 rounded-lg text-sm font-medium text-left transition-all border"
-                  style={selectedGoal === label
-                    ? { background: "#fff5f5", borderColor: "#C00000", color: "#111827", borderWidth: "2px" }
-                    : { background: "white", borderColor: "#e5e7eb", color: "#374151", borderWidth: "1px" }}>
-                  <span style={{ fontSize: "20px" }}>{emoji}</span>
-                  <span className="flex-1">{label}</span>
-                  {selectedGoal === label && (
-                    <span className="text-xs font-bold" style={{ color: "#C00000" }}>✓</span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-              <button onClick={() => setStep("interests")}
-                className="flex items-center gap-2 px-5 py-3 rounded font-semibold text-sm text-gray-600 border border-gray-200 transition-all hover:border-gray-400">
-                ← Back
-              </button>
-              <button onClick={generateRecommendations} disabled={loading}
-                className="flex items-center gap-2 px-8 py-3 rounded font-bold text-white text-sm transition-all disabled:opacity-50 hover:opacity-90"
-                style={{ background: "#C00000" }}>
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>"Get my recommendations →"</>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ── STEP 3 — RESULTS ── */}
-        {step === "results" && (
-          <div>
-            {/* Header */}
-            <div className="mb-8 pb-8 border-b border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C00000" }}>
-                Your recommendations
-              </p>
-              <h2 className="text-3xl font-black text-gray-900 mb-2">
-                {recommendations.length} courses matched for you
-              </h2>
-              <p className="text-gray-500 text-sm">
-                Based on your interest in <strong className="text-gray-900">{selectedInterests.slice(0, 2).join(" & ")}</strong>
-                {selectedGoal && <> · goal to <strong className="text-gray-900">{selectedGoal.toLowerCase()}</strong></>}
-              </p>
-            </div>
-
-            {/* AI advisor card */}
-            {aiReasoning && (
-              <div className="rounded-xl p-5 mb-8 flex gap-4"
-                style={{ background: "#fff5f5", border: "1px solid #fecaca" }}>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-white text-sm font-black"
-                  style={{ background: "#C00000" }}>AI</div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-1.5 text-gray-500">Academic Advisor</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{aiReasoning}</p>
-                </div>
+        <AnimatePresence mode="wait">
+          {step === "interests" && (
+            <motion.div key="interests"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <div className="mb-10">
+                <h2 className="text-2xl font-black text-white mb-2">What are you interested in?</h2>
+                <p style={{ color: "rgba(255,255,255,0.45)" }}>
+                  Select everything that appeals to you — the more you choose, the better your recommendations.
+                </p>
               </div>
-            )}
 
-            {/* Course list */}
-            <div className="space-y-3 mb-10">
-              {recommendations.map((rec, i) => (
-                <div key={rec.course.code}
-                  className="flex items-start gap-4 p-5 rounded-xl border border-gray-100 hover:border-gray-200 transition-all bg-white hover:shadow-sm">
+              <div className="flex flex-wrap gap-2 mb-8">
+                {INTERESTS.map(({ label, emoji }) => (
+                  <motion.button key={label} onClick={() => toggleInterest(label)}
+                    whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 border"
+                    style={selectedInterests.includes(label)
+                      ? { background: "#C00000", color: "white", borderColor: "#C00000", boxShadow: "0 4px 15px rgba(192,0,0,0.3)" }
+                      : { background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", borderColor: "rgba(255,255,255,0.12)" }}>
+                    <span>{emoji}</span>
+                    {label}
+                    {selectedInterests.includes(label) && <span className="text-xs font-bold">✓</span>}
+                  </motion.button>
+                ))}
+              </div>
 
-                  {/* Rank */}
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 text-white"
-                    style={{ background: i === 0 ? "#C00000" : i === 1 ? "#374151" : "#9ca3af" }}>
-                    {i + 1}
+              <div className="mb-8">
+                <label className="block text-sm font-semibold mb-2" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  Anything else? Add your own
+                </label>
+                <input type="text" value={customInterest}
+                  onChange={e => setCustomInterest(e.target.value)}
+                  placeholder="e.g. Urban planning, Film studies, Public health..."
+                  className="w-full px-4 py-3 rounded-lg text-sm text-white outline-none transition-colors"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white" }}
+                  onFocus={e => (e.currentTarget.style.borderColor = "rgba(192,0,0,0.5)")}
+                  onBlur={e => (e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)")}
+                />
+              </div>
+
+              {selectedInterests.length > 0 && (
+                <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  <span className="font-bold text-white">{selectedInterests.length}</span> interest{selectedInterests.length !== 1 ? "s" : ""} selected
+                </p>
+              )}
+
+              <div className="flex items-center justify-between pt-6"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                <div />
+                <NeonButton
+                  onClick={() => setStep("goals")}
+                  disabled={selectedInterests.length === 0 && !customInterest}
+                  variant="solid" size="default"
+                  className="font-bold text-white rounded-lg disabled:opacity-40"
+                  style={{ background: "#C00000" }}>
+                  Next: Your goal →
+                </NeonButton>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 2 — GOALS ── */}
+          {step === "goals" && (
+            <motion.div key="goals"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <div className="mb-10">
+                <h2 className="text-2xl font-black text-white mb-2">What is your career goal?</h2>
+                <p style={{ color: "rgba(255,255,255,0.45)" }}>
+                  This helps us prioritize courses most relevant to your future.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-10">
+                {GOALS.map(({ label, emoji }) => (
+                  <motion.button key={label} onClick={() => setSelectedGoal(label)}
+                    whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-3 px-5 py-4 rounded-xl text-sm font-medium text-left transition-all"
+                    style={selectedGoal === label
+                      ? { background: "rgba(192,0,0,0.12)", border: "2px solid rgba(192,0,0,0.6)", color: "white" }
+                      : { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)" }}>
+                    <span style={{ fontSize: "20px" }}>{emoji}</span>
+                    <span className="flex-1">{label}</span>
+                    {selectedGoal === label && <span className="text-xs font-bold" style={{ color: "#ff8080" }}>✓</span>}
+                  </motion.button>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between pt-6"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                <button onClick={() => setStep("interests")}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all"
+                  style={{ color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  ← Back
+                </button>
+                <NeonButton
+                  onClick={generateRecommendations}
+                  disabled={loading}
+                  variant="solid" size="default"
+                  className="font-bold text-white rounded-lg disabled:opacity-50 flex items-center gap-2"
+                  style={{ background: "#C00000" }}>
+                  {loading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : "Get my recommendations →"}
+                </NeonButton>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 3 — RESULTS ── */}
+          {step === "results" && (
+            <motion.div key="results"
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+
+              <div className="mb-8 pb-8" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#C00000" }}>
+                  Your recommendations
+                </p>
+                <h2 className="text-3xl font-black text-white mb-2">
+                  {recommendations.length} courses matched for you
+                </h2>
+                <p className="text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  Based on interest in <span className="text-white font-bold">{selectedInterests.slice(0, 2).join(" & ")}</span>
+                  {selectedGoal && <> · goal to <span className="text-white font-bold">{selectedGoal.toLowerCase()}</span></>}
+                </p>
+              </div>
+
+              {/* AI advisor */}
+              {aiReasoning && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  className="rounded-2xl p-5 mb-8 flex gap-4"
+                  style={{ background: "rgba(192,0,0,0.08)", border: "1px solid rgba(192,0,0,0.25)" }}>
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-sm font-black"
+                    style={{ background: "#C00000" }}>AI</div>
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: "#C00000" }}>Academic Advisor</p>
+                    <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.7)" }}>{aiReasoning}</p>
                   </div>
+                </motion.div>
+              )}
 
-                  {/* Course info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-xs font-black px-2 py-0.5 rounded"
-                        style={{ background: `${DEPT_COLORS[rec.course.dept] || "#374151"}15`, color: DEPT_COLORS[rec.course.dept] || "#374151" }}>
-                        {rec.course.code}
-                      </span>
-                      <span className="text-xs text-gray-400">{rec.course.credits} credits</span>
-                      <span className="text-xs text-gray-400">· {rec.course.dept}</span>
+              {/* Course cards */}
+              <div className="space-y-3 mb-10">
+                {recommendations.map((rec, i) => (
+                  <motion.div key={rec.course.code}
+                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.07 }}
+                    className="flex items-start gap-4 p-5 rounded-2xl transition-all duration-200 hover:-translate-y-0.5"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0 text-white"
+                      style={{ background: i === 0 ? "#C00000" : i === 1 ? "#374151" : "#1f2937" }}>
+                      {i + 1}
                     </div>
-                    <h3 className="font-black text-gray-900 text-base mb-1">{rec.course.name}</h3>
-                    <p className="text-xs text-gray-500">{rec.reason}</p>
 
-                    {/* Match bar */}
-                    <div className="mt-3 flex items-center gap-3">
-                      <div className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-1000"
-                          style={{ width: `${rec.match}%`, background: matchColor(rec.match) }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-xs font-black px-2 py-0.5 rounded"
+                          style={{ background: `${DEPT_COLORS[rec.course.dept] || "#374151"}20`, color: DEPT_COLORS[rec.course.dept] || "#aaa" }}>
+                          {rec.course.code}
+                        </span>
+                        <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                          {rec.course.credits} credits · {rec.course.dept}
+                        </span>
                       </div>
-                      <span className="text-xs font-black flex-shrink-0"
-                        style={{ color: matchColor(rec.match) }}>
-                        {rec.match}% match
-                      </span>
+                      <h3 className="font-black text-white text-base mb-1">{rec.course.name}</h3>
+                      <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{rec.reason}</p>
+                      <div className="mt-3 flex items-center gap-3">
+                        <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+                          <motion.div className="h-full rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${rec.match}%` }}
+                            transition={{ duration: 1, delay: i * 0.1 }}
+                            style={{ background: matchColor(rec.match) }} />
+                        </div>
+                        <span className="text-xs font-black flex-shrink-0" style={{ color: matchColor(rec.match) }}>
+                          {rec.match}% match
+                        </span>
+                      </div>
                     </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-3 mb-10 p-5 rounded-2xl"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                {[
+                  { value: recommendations.length, label: "Courses matched" },
+                  { value: `${recommendations.reduce((a, r) => a + r.course.credits, 0)} cr`, label: "Total credits" },
+                  { value: `${Math.round(recommendations.reduce((a, r) => a + r.match, 0) / recommendations.length)}%`, label: "Avg match" },
+                ].map(s => (
+                  <div key={s.label} className="text-center">
+                    <div className="text-2xl font-black text-white">{s.value}</div>
+                    <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.35)" }}>{s.label}</div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Summary stats */}
-            <div className="grid grid-cols-3 gap-4 mb-10 p-5 rounded-xl bg-gray-50">
-              {[
-                { value: recommendations.length, label: "Courses matched" },
-                { value: `${recommendations.reduce((a, r) => a + r.course.credits, 0)} cr`, label: "Total credits" },
-                { value: `${Math.round(recommendations.reduce((a, r) => a + r.match, 0) / recommendations.length)}%`, label: "Avg match" },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <div className="text-2xl font-black text-gray-900">{s.value}</div>
-                  <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-100">
-              <button
-                onClick={() => { setStep("interests"); setSelectedInterests([]); setSelectedGoal(""); setRecommendations([]); setAiReasoning(""); }}
-                className="flex-1 py-3 rounded font-semibold text-sm text-gray-600 border border-gray-200 transition-all hover:border-gray-400">
-                ↺ Start over
-              </button>
-              <Link href="/ask"
-                className="flex-1 py-3 rounded font-bold text-sm text-center border border-gray-200 text-gray-700 transition-all hover:border-gray-400">
-                Ask about courses →
-              </Link>
-              <Link href="/planner"
-                className="flex-1 py-3 rounded font-black text-white text-sm text-center transition-all hover:opacity-90"
-                style={{ background: "#C00000" }}>
-                Plan my semester →
-              </Link>
-            </div>
-          </div>
-        )}
+              {/* Actions */}
+              <div className="flex flex-col sm:flex-row gap-3 pt-6"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+                <button
+                  onClick={() => { setStep("interests"); setSelectedInterests([]); setSelectedGoal(""); setRecommendations([]); setAiReasoning(""); }}
+                  className="flex-1 py-3 rounded-xl font-semibold text-sm transition-all"
+                  style={{ color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.1)" }}>
+                  ↺ Start over
+                </button>
+                <Link href="/ask" className="flex-1">
+                  <NeonButton variant="ghost" size="default"
+                    className="w-full font-bold text-sm rounded-xl py-3"
+                    style={{ color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.15)" }}>
+                    Ask about courses →
+                  </NeonButton>
+                </Link>
+                <Link href="/planner" className="flex-1">
+                  <NeonButton variant="solid" size="default"
+                    className="w-full font-black text-white text-sm rounded-xl py-3"
+                    style={{ background: "#C00000" }}>
+                    Plan my semester →
+                  </NeonButton>
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-100 py-6 text-center">
-        <p className="text-xs text-gray-400">
-          CampusPulse · Clark University · Tech Innovation Challenge 2026
+      <div className="text-center py-5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+        <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+          CampusPulse · Clark University · Knowledge base updated April 2026
         </p>
       </div>
     </main>
